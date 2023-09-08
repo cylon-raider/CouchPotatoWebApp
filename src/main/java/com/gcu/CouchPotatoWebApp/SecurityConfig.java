@@ -15,21 +15,25 @@ import org.springframework.security.web.SecurityFilterChain;
 public class SecurityConfig {
 
     @Autowired
-    PasswordEncoder passwordEncoder;
+    private PasswordEncoder passwordEncoder;
 
     @Autowired
-    UserBusinessService service;
+    private UserBusinessService service;
 
     @Autowired
     private HttpSecurity http;
 
+    /**
+     * Configures the security filter chain.
+     *
+     * @return the built security filter chain.
+     * @throws Exception if an error occurs.
+     */
     @Bean
     public SecurityFilterChain securityFilterChain() throws Exception {
         http.csrf().disable()
                 .authorizeRequests()
                 .antMatchers("/service/**").authenticated()
-                .and()
-                .authorizeRequests()
                 .antMatchers("/", "/registration/**", "/images/**").permitAll()
                 .anyRequest().authenticated()
                 .and()
@@ -52,16 +56,32 @@ public class SecurityConfig {
         return http.build();
     }
 
+    /**
+     * Bean for password encoding using BCrypt.
+     *
+     * @return a BCrypt password encoder.
+     */
     @Bean
     public BCryptPasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
 
+    /**
+     * Configures the authentication manager builder with user details service and password encoder.
+     *
+     * @param auth the authentication manager builder.
+     * @throws Exception if an error occurs.
+     */
     @Autowired
     public void configure(AuthenticationManagerBuilder auth) throws Exception {
         auth.userDetailsService(service).passwordEncoder(passwordEncoder);
     }
 
+    /**
+     * Customizes web security to ignore certain static resources.
+     *
+     * @return a web security customizer.
+     */
     @Bean
     public WebSecurityCustomizer webSecurityCustomizer() {
         return web -> web
