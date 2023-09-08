@@ -1,5 +1,6 @@
-package com.gcu.CouchPotatoWebApp.business;
+package com.gcu.CouchPotatoWebApp.rest;
 
+import com.gcu.CouchPotatoWebApp.business.ProductBusinessService;
 import com.gcu.CouchPotatoWebApp.model.ProductList;
 import com.gcu.CouchPotatoWebApp.model.ProductModel;
 import io.swagger.annotations.ApiOperation;
