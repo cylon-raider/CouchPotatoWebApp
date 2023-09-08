@@ -18,6 +18,9 @@ import javax.validation.Valid;
 import java.security.Principal;
 import java.util.List;
 
+/**
+ * ProductController is responsible for handling web requests related to product functionalities.
+ */
 @Controller
 @RequestMapping("/products")
 public class ProductController {
@@ -31,6 +34,12 @@ public class ProductController {
     @Autowired
     private CategoryBusinessService categoryBusinessService;
 
+    /**
+     * Display the product page with a list of all products.
+     *
+     * @param user The authenticated user.
+     * @return ModelAndView containing the product view and related data.
+     */
     @GetMapping("/")
     public ModelAndView display(Principal user){
         ModelAndView modelAndView = new ModelAndView();
@@ -43,6 +52,11 @@ public class ProductController {
         return modelAndView;
     }
 
+    /**
+     * Display the add product page.
+     *
+     * @return ModelAndView containing the add product view and related data.
+     */
     @GetMapping("/add")
     public ModelAndView displayAddProducts(){
         ModelAndView modelAndView = new ModelAndView();
@@ -54,6 +68,11 @@ public class ProductController {
         return modelAndView;
     }
 
+    /**
+     * Display the edit product page.
+     *
+     * @return ModelAndView containing the edit product view and related data.
+     */
     @GetMapping("/update")
     public ModelAndView displayEditProducts(){
         ModelAndView modelAndView = new ModelAndView();
@@ -65,6 +84,11 @@ public class ProductController {
         return modelAndView;
     }
 
+    /**
+     * Display the delete product page.
+     *
+     * @return ModelAndView containing the delete product view and related data.
+     */
     @GetMapping("/delete")
     public ModelAndView displayDeleteProducts(){
         ModelAndView modelAndView = new ModelAndView();
@@ -75,6 +99,16 @@ public class ProductController {
         return modelAndView;
     }
 
+    /**
+     * Handle the addition of a new product.
+     *
+     * @param productModel The product data.
+     * @param productCategory The category of the product.
+     * @param bindingResult Validation results.
+     * @param model The model to add attributes.
+     * @param user The authenticated user.
+     * @return ModelAndView containing the appropriate view based on the operation result.
+     */
     @PostMapping("/addProduct")
     public ModelAndView addProduct(@Valid ProductModel productModel, String productCategory, BindingResult bindingResult, Model model, Principal user){
         ModelAndView modelAndView = new ModelAndView();
@@ -91,6 +125,16 @@ public class ProductController {
         }
     }
 
+    /**
+     * Handle the update of an existing product.
+     *
+     * @param productModel The updated product data.
+     * @param productCategory The category of the product.
+     * @param bindingResult Validation results.
+     * @param model The model to add attributes.
+     * @param user The authenticated user.
+     * @return ModelAndView containing the appropriate view based on the operation result.
+     */
     @PostMapping("/updateProduct")
     public ModelAndView updateProduct(@Valid ProductModel productModel, String productCategory, BindingResult bindingResult, Model model, Principal user){
         ModelAndView modelAndView = new ModelAndView();
@@ -107,6 +151,13 @@ public class ProductController {
         }
     }
 
+    /**
+     * Handle the deletion of a product.
+     *
+     * @param productModel The product to be deleted.
+     * @param user The authenticated user.
+     * @return ModelAndView containing the appropriate view based on the operation result.
+     */
     @PostMapping("/deleteProduct")
     public ModelAndView deleteProduct(ProductModel productModel, Principal user) {
         ModelAndView modelAndView = new ModelAndView();
@@ -120,6 +171,14 @@ public class ProductController {
         }
     }
 
+    /**
+     * Display the search results for products based on a query.
+     *
+     * @param q The search query.
+     * @param model The model to add attributes.
+     * @param user The authenticated user.
+     * @return ModelAndView containing the search results view and related data.
+     */
     @GetMapping("/search")
     public ModelAndView showSearchForm(@Valid String q, Model model, Principal user) {
         ModelAndView modelAndView = new ModelAndView();
@@ -132,5 +191,4 @@ public class ProductController {
         model.addAttribute("products", products);
         return modelAndView;
     }
-
 }

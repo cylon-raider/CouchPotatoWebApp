@@ -13,6 +13,9 @@ import org.springframework.web.servlet.ModelAndView;
 
 import javax.validation.Valid;
 
+/**
+ * RegistrationController is responsible for handling web requests related to user registration.
+ */
 @Controller
 @RequestMapping("/registration")
 public class RegistrationController {
@@ -20,6 +23,11 @@ public class RegistrationController {
     @Autowired
     private UserBusinessService userBusinessService;
 
+    /**
+     * Display the registration form.
+     *
+     * @return ModelAndView containing the registration view and related data.
+     */
     @GetMapping("/")
     public ModelAndView display() {
         ModelAndView modelAndView = new ModelAndView();
@@ -30,6 +38,14 @@ public class RegistrationController {
         return modelAndView;
     }
 
+    /**
+     * Handle the registration of a new user.
+     *
+     * @param userModel The user data.
+     * @param bindingResult Validation results.
+     * @param model The model to add attributes.
+     * @return String indicating the appropriate view based on the operation result.
+     */
     @PostMapping("/register")
     public String register(@Valid UserModel userModel, BindingResult bindingResult, Model model) {
         // Check validation errors
@@ -44,6 +60,5 @@ public class RegistrationController {
         }else {
             return "registration";
         }
-
     }
 }
