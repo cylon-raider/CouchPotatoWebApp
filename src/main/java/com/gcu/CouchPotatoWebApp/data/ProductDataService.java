@@ -10,21 +10,33 @@ import javax.sql.DataSource;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Service class to handle CRUD operations related to products.
+ */
 @Service
 public class ProductDataService implements DataAccessInterface<ProductModel> {
 
-    @SuppressWarnings("unused")
     @Autowired
     private DataSource dataSource;
 
     @Autowired
     private JdbcTemplate jdbcTemplate;
 
+    /**
+     * Constructor to initialize the JDBC template.
+     *
+     * @param dataSource The data source for the database connection.
+     */
     public ProductDataService(DataSource dataSource) {
         this.dataSource = dataSource;
         this.jdbcTemplate = new JdbcTemplate(dataSource);
     }
 
+    /**
+     * Fetch all products from the database.
+     *
+     * @return List of products.
+     */
     @Override
     public List<ProductModel> getAll() {
         String sql = "SELECT * FROM PRODUCT";
@@ -45,6 +57,12 @@ public class ProductDataService implements DataAccessInterface<ProductModel> {
         return products;
     }
 
+    /**
+     * Fetch a specific product based on its ID.
+     *
+     * @param id The ID of the product.
+     * @return The product details.
+     */
     @Override
     public ProductModel getById(int id) {
         String sql = "SELECT * FROM PRODUCT WHERE PRODUCT_ID = ?";
@@ -64,6 +82,12 @@ public class ProductDataService implements DataAccessInterface<ProductModel> {
         return product;
     }
 
+    /**
+     * Add a new product to the database.
+     *
+     * @param productModel The product details.
+     * @return true if the creation was successful, false otherwise.
+     */
     @Override
     public boolean create(ProductModel productModel) {
         String sql = "INSERT INTO PRODUCT(PRODUCT_NAME, PRODUCT_DESCRIPTION, PRODUCT_PRICE, PRODUCT_QUANTITY, PRODUCT_CATEGORY) VALUES(?,?,?,?,?)";
@@ -77,6 +101,12 @@ public class ProductDataService implements DataAccessInterface<ProductModel> {
         return true;
     }
 
+    /**
+     * Update the details of an existing product in the database.
+     *
+     * @param productModel The updated product details.
+     * @return true if the update was successful, false otherwise.
+     */
     @Override
     public boolean update(ProductModel productModel) {
         String sql = "UPDATE PRODUCT SET PRODUCT_NAME = ?, PRODUCT_DESCRIPTION = ?, PRODUCT_PRICE = ?, PRODUCT_QUANTITY = ?, PRODUCT_CATEGORY = ? WHERE PRODUCT_ID = ?";
@@ -90,6 +120,12 @@ public class ProductDataService implements DataAccessInterface<ProductModel> {
         return true;
     }
 
+    /**
+     * Delete a product from the database.
+     *
+     * @param productModel The product to be deleted.
+     * @return true if the deletion was successful, false otherwise.
+     */
     @Override
     public boolean delete(ProductModel productModel) {
         String sql = "DELETE FROM PRODUCT WHERE PRODUCT_ID = ?";
@@ -102,12 +138,16 @@ public class ProductDataService implements DataAccessInterface<ProductModel> {
         return true;
     }
 
-    public List<ProductModel> findByNameContainingIgnoreCase(String query)
-    {
+    /**
+     * Search for products based on a query string. The search checks the product name, description, and category.
+     *
+     * @param query The search query.
+     * @return List of products that match the search criteria.
+     */
+    public List<ProductModel> findByNameContainingIgnoreCase(String query) {
         String sql = "SELECT * FROM PRODUCT WHERE PRODUCT_NAME LIKE ? OR PRODUCT_DESCRIPTION LIKE ? OR PRODUCT_CATEGORY LIKE ?";
         List<ProductModel> products = new ArrayList<>();
         try {
-
             SqlRowSet srs = jdbcTemplate.queryForRowSet(sql, "%" + query + "%", "%" + query + "%", "%" + query + "%");
             while (srs.next()) {
                 products.add(new ProductModel(srs.getInt("PRODUCT_ID"),
