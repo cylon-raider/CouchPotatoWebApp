@@ -13,8 +13,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Service
-public class CartBusinessService
-{
+public class CartBusinessService {
+
     @Autowired
     private CartDataService cartDataService;
 
@@ -24,139 +24,106 @@ public class CartBusinessService
     @Autowired
     private UserDataService userDataService;
 
-    public List<CartItem> getCartItemsByUsername(String username)
-    {
-        List<CartItem> items = new ArrayList<CartItem>();
+    /**
+     * Retrieves cart items for a given username.
+     *
+     * @param username the username of the user.
+     * @return a list of cart items.
+     */
+    public List<CartItem> getCartItemsByUsername(String username) {
         CartModel cart = cartDataService.getById(userDataService.getUserIdByUsername(username));
-        if (cart.getItems() != null)
-        {
-            items = cart.getItems();
-            return items;
-        }
-        return items;
+        return cart.getItems() != null ? cart.getItems() : new ArrayList<>();
     }
 
-    // add an item to an existing cart, create the cart if it does not exist.
-    public void addItem(String username, int productId)
-    {
+    /**
+     * Adds an item to a user's cart. If the cart doesn't exist, it creates one.
+     *
+     * @param username  the username of the user.
+     * @param productId the ID of the product to add.
+     */
+    public void addItem(String username, int productId) {
         CartModel cart = cartDataService.getById(userDataService.getUserIdByUsername(username));
         ProductModel product = productDataService.getById(productId);
         CartItem item = new CartItem(product.getProductId(), product.getProductName(), product.getProductDescription(),
                 product.getProductPrice(), 1);
-        CartModel newCart = new CartModel();
-        List<CartItem> itemList = new ArrayList<CartItem>();
-        if (cart.getUserId() == 0)
-        {
-            System.out.println("adding item to new cart...");
 
-            try
-            {
-                itemList.add(item);
-                newCart.setUserId(userDataService.getUserIdByUsername(username));
-                newCart.setItems(itemList);
-                cartDataService.create(newCart);
-            } catch (Exception e)
-            {
-                e.printStackTrace();
-            }
-        } else
-        {
-            System.out.println("adding item to existing cart...");
-
-            try
-            {
-                boolean itemExists = false;
-
-                System.out.println("checking for existing item...");
-
-                for(CartItem currentItem : cart.getItems()) {
-                    if (currentItem.getName().compareTo(item.getName()) == 0) {
-                        itemExists = true;
-                        cart.removeItem(currentItem);
-                    }
-                    if(itemExists) {
-                        break;
-                    }
-                }
-
-                if(itemExists)
-                {
-                    System.out.println("item already in cart! incrementing qty...");
-
-                    int currentItemQty = item.getQty();
-                    item.setQty(currentItemQty + 1);
-                    cart.addItem(item);
-                    cartDataService.update(cart);
-
-                } else
-                {
-                    System.out.println("adding new item to existing cart...");
-
-                    cart.getItems().add(item);
-                    cartDataService.update(cart);
-                }
-            } catch (Exception e)
-            {
-                e.printStackTrace();
-            }
+        if (cart.getUserId() == 0) {
+            createNewCart(username, item);
+        } else {
+            addItemToExistingCart(cart, item);
         }
     }
 
-    // change an item's quantity
-    public void updateItem(String username, int productId, int quantity)
-    {
+    /**
+     * Updates the quantity of an item in a user's cart.
+     *
+     * @param username  the username of the user.
+     * @param productId the ID of the product to update.
+     * @param quantity  the new quantity.
+     */
+    public void updateItem(String username, int productId, int quantity) {
         CartModel cart = cartDataService.getById(userDataService.getUserIdByUsername(username));
         ProductModel product = productDataService.getById(productId);
         CartItem updatedItem = new CartItem(product.getProductId(), product.getProductName(), product.getProductDescription(),
                 product.getProductPrice(), quantity);
-        try
-        {
-            List<CartItem> currentItemList = cart.getItems();
-            List<CartItem> newItemList = new ArrayList<CartItem>();
-            newItemList.add(updatedItem);
-            for (CartItem item : currentItemList)
-            {
-                if (!item.getName().contentEquals(updatedItem.getName()))
-                {
-                    newItemList.add(item);
-                }
-            }
-            cart.setItems(newItemList);
-            cartDataService.update(cart);
-        } catch (Exception e)
-        {
-            e.printStackTrace();
-        }
+
+        List<CartItem> currentItemList = cart.getItems();
+        currentItemList.removeIf(item -> item.getName().equals(updatedItem.getName()));
+        currentItemList.add(updatedItem);
+
+        cart.setItems(currentItemList);
+        cartDataService.update(cart);
     }
 
-    // delete an item from a cart
-    public void deleteItem(String username, int productId)
-    {
+    /**
+     * Deletes an item from a user's cart.
+     *
+     * @param username  the username of the user.
+     * @param productId the ID of the product to delete.
+     */
+    public void deleteItem(String username, int productId) {
         CartModel cart = cartDataService.getById(userDataService.getUserIdByUsername(username));
         ProductModel product = productDataService.getById(productId);
-        try
-        {
-            List<CartItem> currentItemList = cart.getItems();
-            List<CartItem> newItemList = new ArrayList<CartItem>();
-            for (CartItem item : currentItemList)
-            {
-                if (!item.getName().contentEquals(product.getProductName()))
-                {
-                    newItemList.add(item);
-                }
-            }
-            cart.setItems(newItemList);
-            cartDataService.update(cart);
-        } catch (Exception e)
-        {
-            e.printStackTrace();
-        }
+
+        cart.getItems().removeIf(item -> item.getName().equals(product.getProductName()));
+        cartDataService.update(cart);
     }
 
-    // empty cart (simply deletes entire row from database)
-    public boolean emptyCart(String username)
-    {
+    /**
+     * Empties a user's cart.
+     *
+     * @param username the username of the user.
+     * @return true if successful, false otherwise.
+     */
+    public boolean emptyCart(String username) {
         CartModel cart = cartDataService.getById(userDataService.getUserIdByUsername(username));
         return cartDataService.delete(cart);
+    }
+
+    private void createNewCart(String username, CartItem item) {
+        List<CartItem> itemList = new ArrayList<>();
+        itemList.add(item);
+
+        CartModel newCart = new CartModel();
+        newCart.setUserId(userDataService.getUserIdByUsername(username));
+        newCart.setItems(itemList);
+
+        cartDataService.create(newCart);
+    }
+
+    private void addItemToExistingCart(CartModel cart, CartItem item) {
+        boolean itemExists = cart.getItems().stream().anyMatch(currentItem -> currentItem.getName().equals(item.getName()));
+
+        if (itemExists) {
+            for (CartItem currentItem : cart.getItems()) {
+                if (currentItem.getName().equals(item.getName())) {
+                    currentItem.setQty(currentItem.getQty() + 1);
+                }
+            }
+        } else {
+            cart.getItems().add(item);
+        }
+
+        cartDataService.update(cart);
     }
 }
