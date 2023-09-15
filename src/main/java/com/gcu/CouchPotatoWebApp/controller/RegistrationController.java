@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.ModelAndView;
 
-import javax.validation.Valid;
+
 
 /**
  * RegistrationController is responsible for handling web requests related to user registration.
@@ -47,7 +47,7 @@ public class RegistrationController {
      * @return String indicating the appropriate view based on the operation result.
      */
     @PostMapping("/register")
-    public String register(@Valid UserModel userModel, BindingResult bindingResult, Model model) {
+    public String register(UserModel userModel, BindingResult bindingResult, Model model) {
         // Check validation errors
         ModelAndView modelAndView = new ModelAndView();
         if(bindingResult.hasErrors())

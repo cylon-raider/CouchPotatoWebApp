@@ -2,10 +2,8 @@ package com.gcu.CouchPotatoWebApp.data;
 
 import com.gcu.CouchPotatoWebApp.model.LoginModel;
 import com.gcu.CouchPotatoWebApp.model.UserModel;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.rowset.SqlRowSet;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import javax.sql.DataSource;
@@ -18,11 +16,9 @@ import java.util.List;
 @Service
 public class UserDataService implements DataAccessInterface<UserModel> {
 
-    @Autowired
-    private DataSource dataSource;
+    private static final String TABLE_NAME = "user"; // changed from USER
+    private final JdbcTemplate jdbcTemplate;
 
-    @Autowired
-    private JdbcTemplate jdbcTemplate;
 
     /**
      * Constructor to initialize the data source and JDBC template.
@@ -30,8 +26,9 @@ public class UserDataService implements DataAccessInterface<UserModel> {
      * @param dataSource The data source for the database connection.
      */
     public UserDataService(DataSource dataSource) {
-        this.dataSource = dataSource;
         this.jdbcTemplate = new JdbcTemplate(dataSource);
+
+
     }
 
     /**
@@ -41,7 +38,7 @@ public class UserDataService implements DataAccessInterface<UserModel> {
      */
     @Override
     public List<UserModel> getAll() {
-        String sql = "SELECT * FROM USER";
+        String sql = "SELECT * FROM " + TABLE_NAME;
         List<UserModel> users = new ArrayList<>();
         try {
             SqlRowSet srs = jdbcTemplate.queryForRowSet(sql);
@@ -64,7 +61,7 @@ public class UserDataService implements DataAccessInterface<UserModel> {
      */
     @Override
     public UserModel getById(int id) {
-        String sql = "SELECT * FROM USER WHERE USER_ID = ?";
+        String sql = "SELECT * FROM " + TABLE_NAME + " WHERE USER_ID = ?";
         UserModel user = new UserModel();
         try {
             SqlRowSet srs = jdbcTemplate.queryForRowSet(sql, id);
@@ -93,12 +90,10 @@ public class UserDataService implements DataAccessInterface<UserModel> {
      */
     @Override
     public boolean create(UserModel user) {
-        BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
-        String hashedPassword = passwordEncoder.encode(user.getPassword());
-        String sql = "INSERT INTO USER(FIRST_NAME, LAST_NAME, EMAIL, PHONE_NUMBER, USERNAME, PASSWORD) VALUES (?,?,?,?,?,?)";
+        String sql = "INSERT INTO " + TABLE_NAME + "(FIRST_NAME, LAST_NAME, EMAIL, PHONE_NUMBER, USERNAME, PASSWORD) VALUES (?,?,?,?,?,?)";
         try {
             jdbcTemplate.update(sql, user.getFirstName(), user.getLastName(), user.getEmail(), user.getPhoneNumber(),
-                    user.getUsername(), hashedPassword);
+                    user.getUsername());
         } catch (Exception e) {
             e.printStackTrace();
             return false;
@@ -114,10 +109,10 @@ public class UserDataService implements DataAccessInterface<UserModel> {
      */
     @Override
     public boolean update(UserModel user) {
-        String sql = "UPDATE USER SET FIRST_NAME = ?, LAST_NAME = ?, EMAIL = ?, PHONE_NUMBER = ?, USERNAME = ?, PASSWORD = ? WHERE USER_ID = ?";
+        String sql = "UPDATE " + TABLE_NAME + " SET FIRST_NAME = ?, LAST_NAME = ?, EMAIL = ?, PHONE_NUMBER = ?, USERNAME = ?, PASSWORD = ? WHERE USER_ID = ?";
         try {
             jdbcTemplate.update(sql, user.getFirstName(), user.getLastName(), user.getEmail(), user.getPhoneNumber(),
-                    user.getUsername(), user.getPassword(), user.getUserId());
+                    user.getUsername(), user.getUserId());
         } catch (Exception e) {
             e.printStackTrace();
             return false;
@@ -133,7 +128,7 @@ public class UserDataService implements DataAccessInterface<UserModel> {
      */
     @Override
     public boolean delete(UserModel userModel) {
-        String sql = "DELETE FROM USER WHERE USER_ID = ?";
+        String sql = "DELETE FROM " + TABLE_NAME + " WHERE USER_ID = ?";
         try {
             jdbcTemplate.update(sql, userModel.getUserId());
         } catch (Exception e) {
@@ -150,7 +145,7 @@ public class UserDataService implements DataAccessInterface<UserModel> {
      * @return The login details of the user.
      */
     public LoginModel findByUsername(String username) {
-        String sql = "SELECT * FROM USER WHERE USERNAME = ?";
+        String sql = "SELECT * FROM " + TABLE_NAME + " WHERE USERNAME = ?";
         LoginModel loginModel = new LoginModel();
         try {
             SqlRowSet srs = jdbcTemplate.queryForRowSet(sql, username);
@@ -172,7 +167,7 @@ public class UserDataService implements DataAccessInterface<UserModel> {
      * @return The user's authority details.
      */
     public UserModel getUserAuthority(String username) {
-        String sql = "SELECT * FROM USER WHERE USERNAME = ?";
+        String sql = "SELECT * FROM " + TABLE_NAME + " WHERE USERNAME = ?";
         UserModel user = new UserModel();
         try {
             SqlRowSet srs = jdbcTemplate.queryForRowSet(sql, username);
@@ -193,7 +188,7 @@ public class UserDataService implements DataAccessInterface<UserModel> {
      * @return The ID of the user.
      */
     public int getUserIdByUsername(String username) {
-        String sql = "SELECT * FROM USER WHERE USERNAME = ?";
+        String sql = "SELECT * FROM " + TABLE_NAME + " WHERE USERNAME = ?";
         int userId = 0;
         try {
             SqlRowSet srs = jdbcTemplate.queryForRowSet(sql, username);

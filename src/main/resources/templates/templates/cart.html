@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorate="layouts/defaultTemplate">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Products</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/5.0.0-alpha2/css/bootstrap.min.css"
+        integrity="sha384-vtMzW/6KiqwclQ1uxEhUnTU7fWMoFdTJLqoogoXcX1xISxgjWlmbhXwO5kiS34v+" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.10.22/css/dataTables.bootstrap5.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.1/css/all.min.css"
+        integrity="sha512-/vE1ZaR1xD/JFD5L5j5Zf60zRtR1jrtukwMu8kbF10+AWfXpLh3qTW3d61HzZ/bx+ZiNccT0nNwN05SzfCv7w=="
+        crossorigin="anonymous" />
+    <style>
+        .footer {
+            position: fixed;
+            left: 0;
+            bottom: 0;
+            width: 100%;
+            background-color: #9CB2BC;
+            color: black;
+            text-align: center;
+        }
+
+        .cartTable {
+            margin: 0 auto;
+        }
+    </style>
+
+</head>
+
+<body>
+
+    <div class="cartTable container-fluid" layout:fragment="table">
+        <h2 class="text-center mb-4">Cart</h2>
+        <div class="row">
+            <div class="col-md-12">
+                <table id="cartTable" class="table table-striped table-bordered" style="width:100%">
+                    <thead>
+                        <tr>
+                            <th class="text-center">Item Name</th>
+                            <th class="text-center">Item Description</th>
+                            <th class="text-center">Item Price</th>
+                            <th class="text-center">Item Quantity</th>
+                            <th class="text-center">Item Total</th>
+            			</tr>
+                    </thead>
+                    <tbody>
+					    <tr th:if="${items.isEmpty()}">
+					        <td class="text-center" colspan="5">Your Cart is Empty :(</td>
+					    </tr>
+					    <tr th:each="CartItem : ${items}">
+					        <td class="text-center"><h5 th:text="${CartItem.name}">Product 1</h5></td>
+					        <td class="text-center"><h5 th:text="${CartItem.description}">1.0</h5></td>
+					        <td class="text-center"><h5 th:text="${CartItem.price}">1</h5></td>
+					        <td class="text-center">
+					        	<a th:href="@{/cart/deleteItem?productId={id}(id=${CartItem.id})}" class="btn">Delete</a>
+					        	<a th:href="@{/cart/decrementItem?productId={id}&itemQty={qty}(id=${CartItem.id}, qty=${CartItem.qty})}" class="btn">-</a>
+					        	<h5 th:text="${CartItem.qty}" style="display: inline-block;">1</h5>	
+					        	<a th:href="@{/cart/incrementItem?productId={id}&itemQty={qty}(id=${CartItem.id}, qty=${CartItem.qty})}" class="btn">+</a>
+					        </td>        
+					        <td class="text-center"><h5 th:text="${CartItem.total}">1</h5></td>
+					    </tr>
+	                </tbody>
+                </table>
+                
+                <!-- add cart sub-total, tax, shipping, and grand total here -->
+                
+            </div>
+        </div>
+    </div>
+    <div class="footer" layout:fragment="footer"></div>
+
+</body>
+</html>

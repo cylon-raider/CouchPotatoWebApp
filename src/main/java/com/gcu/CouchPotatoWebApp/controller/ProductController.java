@@ -13,8 +13,6 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.ModelAndView;
-
-import javax.validation.Valid;
 import java.security.Principal;
 import java.util.List;
 
@@ -110,7 +108,7 @@ public class ProductController {
      * @return ModelAndView containing the appropriate view based on the operation result.
      */
     @PostMapping("/addProduct")
-    public ModelAndView addProduct(@Valid ProductModel productModel, String productCategory, BindingResult bindingResult, Model model, Principal user){
+    public ModelAndView addProduct(ProductModel productModel, String productCategory, BindingResult bindingResult, Model model, Principal user){
         ModelAndView modelAndView = new ModelAndView();
         modelAndView.setViewName("addProduct");
         productModel.setProductCategory(productCategory);
@@ -136,7 +134,7 @@ public class ProductController {
      * @return ModelAndView containing the appropriate view based on the operation result.
      */
     @PostMapping("/updateProduct")
-    public ModelAndView updateProduct(@Valid ProductModel productModel, String productCategory, BindingResult bindingResult, Model model, Principal user){
+    public ModelAndView updateProduct(ProductModel productModel, String productCategory, BindingResult bindingResult, Model model, Principal user){
         ModelAndView modelAndView = new ModelAndView();
         modelAndView.setViewName("updateProduct");
         productModel.setProductCategory(productCategory);
@@ -180,7 +178,7 @@ public class ProductController {
      * @return ModelAndView containing the search results view and related data.
      */
     @GetMapping("/search")
-    public ModelAndView showSearchForm(@Valid String q, Model model, Principal user) {
+    public ModelAndView showSearchForm(String q, Model model, Principal user) {
         ModelAndView modelAndView = new ModelAndView();
         modelAndView.setViewName("search");
         List<ProductModel> products = productBusinessService.findByNameContainingIgnoreCase(q);

@@ -2,9 +2,6 @@ package com.gcu.CouchPotatoWebApp.model;
 
 import io.swagger.annotations.ApiModelProperty;
 
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Size;
-
 /**
  * Represents a product category.
  */
@@ -14,8 +11,6 @@ public class CategoryModel {
     private Integer categoryId;
 
     // Name of the category
-    @NotNull(message="Add a category to help users find products")
-    @Size(min=1, max=32, message="Category name must be between 1 and 32 characters")
     @ApiModelProperty(value="Product Category", example="Apparel")
     private String categoryName;
 
